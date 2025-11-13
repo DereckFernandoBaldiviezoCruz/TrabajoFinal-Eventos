@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db_eventos:
+    image: postgres:16
+    container_name: db_eventos
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: casigano_eventos_db
+    ports:
+      - "5433:5432"          # Para acceder desde tu máquina si quieres (opcional)
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  eventos_service:
+    build: .
+    container_name: eventos_service
+    depends_on:
+      - db_eventos
+    environment:
+      DB_HOST: db_eventos
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: casigano_eventos_db
+      JWT_SECRET: supersecret
+      JWT_ALGORITHM: HS256
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
