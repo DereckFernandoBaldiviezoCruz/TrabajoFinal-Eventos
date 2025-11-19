@@ -3,12 +3,14 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
+import threading
 
 from . import models, schemas
 from .database import engine, Base, get_db
 from .auth import get_current_user
+from .grpc_server import serve_grpc
 
-# Crear tablas al iniciar (por si acaso)
+# Crear tablas al iniciar
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -22,6 +24,19 @@ app = FastAPI(
 )
 
 API_PREFIX = "/api/v1"
+
+
+# Lanzar servidor gRPC en un hilo aparte cuando arranque la app
+def start_grpc_server():
+    # Ejecuta el servidor gRPC (bloqueante) en un hilo daemon
+    grpc_thread = threading.Thread(target=serve_grpc, daemon=True)
+    grpc_thread.start()
+
+
+@app.on_event("startup")
+def startup_event():
+    # Este evento se ejecuta cuando FastAPI arranca
+    start_grpc_server()
 
 
 @app.get(f"{API_PREFIX}/health", tags=["health"])

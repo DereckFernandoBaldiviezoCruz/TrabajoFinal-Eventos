@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package eventos;
+
+// Servicio gRPC que expondrá tu microservicio de Eventos
+service EventoService {
+  // Obtener un evento por ID
+  rpc GetEvento (GetEventoRequest) returns (EventoResponse);
+
+  // Listar eventos (por ahora todos)
+  rpc ListEventos (ListEventosRequest) returns (ListEventosResponse);
+}
+
+// Petición para obtener un evento
+message GetEventoRequest {
+  string id = 1; // UUID del evento en texto
+}
+
+// Respuesta con un evento
+message EventoResponse {
+  string id = 1;
+  string nombre = 2;
+  string deporte = 3;
+  string fecha = 4;
+  string estado = 5;
+  string equipo_local = 6;
+  string equipo_visitante = 7;
+  double cuota_local = 8;
+  double cuota_empate = 9;
+  double cuota_visitante = 10;
+}
+
+// Petición para listar eventos (por ahora sin filtros)
+message ListEventosRequest {}
+
+// Respuesta con lista de eventos
+message ListEventosResponse {
+  repeated EventoResponse eventos = 1;
+}

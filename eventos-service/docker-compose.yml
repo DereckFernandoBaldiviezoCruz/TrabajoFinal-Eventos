@@ -28,5 +28,6 @@ services:
       JWT_SECRET: supersecret
       JWT_ALGORITHM: HS256
     ports:
-      - "8000:8000"
+      - "8000:8000"   # REST (FastAPI)
+      - "50051:50051" # gRPC
     restart: unless-stopped
